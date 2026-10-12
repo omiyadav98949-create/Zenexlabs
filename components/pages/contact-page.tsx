@@ -1,27 +1,27 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, Check, Loader2 } from 'lucide-react';
-import { SectionLabel, FadeInUp } from '@/components/motion-primitives';
-import { cn } from '@/lib/utils';
-import { siteConfig } from '@/lib/site-config';
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowUpRight, Check, Loader2 } from "lucide-react";
+import { SectionLabel, FadeInUp } from "@/components/motion-primitives";
+import { cn } from "@/lib/utils";
+import { siteConfig } from "@/lib/site-config";
 
 const projectTypes = [
-  'Cinematic Ad',
-  'Product Film',
-  'Social Creatives',
-  'AI UGC',
-  'Brand Visuals',
-  'Creative Campaign',
-  'Not Sure Yet',
+  "Cinematic Ad",
+  "Product Film",
+  "Social Creatives",
+  "AI UGC",
+  "Brand Visuals",
+  "Creative Campaign",
+  "Not Sure Yet",
 ];
 
 const budgets = [
-  'Under ₹5,000',
-  '₹5,000–₹10,000',
-  '₹10,000–₹25,000',
-  '₹25,000+',
+  "Under ₹5,000",
+  "₹5,000–₹10,000",
+  "₹10,000–₹25,000",
+  "₹25,000+",
   "Let's discuss",
 ];
 
@@ -39,33 +39,37 @@ type FormState = {
 };
 
 const initialState: FormState = {
-  name: '',
-  email: '',
-  brand: '',
-  website: '',
-  instagram: '',
-  product_category: '',
-  project_type: '',
-  budget: '',
-  timeline: '',
-  message: '',
+  name: "",
+  email: "",
+  brand: "",
+  website: "",
+  instagram: "",
+  product_category: "",
+  project_type: "",
+  budget: "",
+  timeline: "",
+  message: "",
 };
 
 export function ContactPage() {
   const [form, setForm] = useState<FormState>(initialState);
-  const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof FormState, string>>
+  >({});
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
 
   const validate = (): boolean => {
     const e: Partial<Record<keyof FormState, string>> = {};
-    if (!form.name.trim()) e.name = 'Required';
+    if (!form.name.trim()) e.name = "Required";
     if (!form.email.trim()) {
-      e.email = 'Required';
+      e.email = "Required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      e.email = 'Invalid email';
+      e.email = "Invalid email";
     }
-    if (!form.brand.trim()) e.brand = 'Required';
-    if (!form.message.trim()) e.message = 'Required';
+    if (!form.brand.trim()) e.brand = "Required";
+    if (!form.message.trim()) e.message = "Required";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -81,22 +85,22 @@ export function ContactPage() {
     e.preventDefault();
     if (!validate()) return;
 
-    setStatus('loading');
+    setStatus("loading");
     try {
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
       if (!supabaseUrl || !supabaseKey) {
-        throw new Error('Configuration missing');
+        throw new Error("Configuration missing");
       }
 
       const response = await fetch(`${supabaseUrl}/rest/v1/project_inquiries`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           apikey: supabaseKey,
           Authorization: `Bearer ${supabaseKey}`,
-          Prefer: 'return=minimal',
+          Prefer: "return=minimal",
         },
         body: JSON.stringify({
           name: form.name.trim(),
@@ -113,27 +117,27 @@ export function ContactPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Submission failed');
+        throw new Error("Submission failed");
       }
 
       // Fire edge function for email notification (best effort)
       fetch(`${supabaseUrl}/functions/v1/send-inquiry-notification`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${supabaseKey}`,
         },
         body: JSON.stringify(form),
       }).catch(() => {});
 
-      setStatus('success');
+      setStatus("success");
       setForm(initialState);
     } catch {
-      setStatus('error');
+      setStatus("error");
     }
   };
 
-  if (status === 'success') {
+  if (status === "success") {
     return (
       <main className="pt-28 md:pt-32 min-h-screen flex items-center justify-center px-6 lg:px-10">
         <motion.div
@@ -154,7 +158,7 @@ export function ContactPage() {
             Your inquiry has been received. We&apos;ll get back to you shortly.
           </p>
           <button
-            onClick={() => setStatus('idle')}
+            onClick={() => setStatus("idle")}
             className="mt-10 inline-flex items-center gap-2 rounded-full border border-border px-8 py-4 text-xs font-medium tracking-[0.1em] uppercase text-foreground transition-all duration-300 hover:border-accent hover:bg-accent hover:text-accent-foreground"
           >
             Send Another
@@ -206,7 +210,7 @@ export function ContactPage() {
                 required
                 error={errors.name}
                 value={form.name}
-                onChange={(v) => handleChange('name', v)}
+                onChange={(v) => handleChange("name", v)}
                 placeholder="Your name"
               />
               <FormField
@@ -215,7 +219,7 @@ export function ContactPage() {
                 error={errors.email}
                 type="email"
                 value={form.email}
-                onChange={(v) => handleChange('email', v)}
+                onChange={(v) => handleChange("email", v)}
                 placeholder="you@brand.com"
               />
               <FormField
@@ -223,25 +227,25 @@ export function ContactPage() {
                 required
                 error={errors.brand}
                 value={form.brand}
-                onChange={(v) => handleChange('brand', v)}
+                onChange={(v) => handleChange("brand", v)}
                 placeholder="Brand name"
               />
               <FormField
                 label="Website"
                 value={form.website}
-                onChange={(v) => handleChange('website', v)}
+                onChange={(v) => handleChange("website", v)}
                 placeholder="https://..."
               />
               <FormField
                 label="Instagram"
                 value={form.instagram}
-                onChange={(v) => handleChange('instagram', v)}
+                onChange={(v) => handleChange("instagram", v)}
                 placeholder="@handle"
               />
               <FormField
                 label="Product / Category"
                 value={form.product_category}
-                onChange={(v) => handleChange('product_category', v)}
+                onChange={(v) => handleChange("product_category", v)}
                 placeholder="e.g. Skincare, Jewelry..."
               />
             </div>
@@ -256,12 +260,12 @@ export function ContactPage() {
                   <button
                     key={pt}
                     type="button"
-                    onClick={() => handleChange('project_type', pt)}
+                    onClick={() => handleChange("project_type", pt)}
                     className={cn(
-                      'rounded-full px-4 py-2 text-xs font-medium tracking-wide transition-all duration-300',
+                      "rounded-full px-4 py-2 text-xs font-medium tracking-wide transition-all duration-300",
                       form.project_type === pt
-                        ? 'bg-accent text-accent-foreground'
-                        : 'border border-border text-muted-foreground hover:border-accent hover:text-foreground'
+                        ? "bg-accent text-accent-foreground"
+                        : "border border-border text-muted-foreground hover:border-accent hover:text-foreground",
                     )}
                   >
                     {pt}
@@ -271,7 +275,7 @@ export function ContactPage() {
             </div>
 
             {/* Budget — chips */}
-            <div>
+            {/* <div>
               <label className="block text-[10px] font-medium tracking-[0.25em] uppercase text-muted-foreground mb-4">
                 Budget Range
               </label>
@@ -292,13 +296,13 @@ export function ContactPage() {
                   </button>
                 ))}
               </div>
-            </div>
+            </div> */}
 
             {/* Timeline */}
             <FormField
               label="Timeline"
               value={form.timeline}
-              onChange={(v) => handleChange('timeline', v)}
+              onChange={(v) => handleChange("timeline", v)}
               placeholder="e.g. 2 weeks, next month..."
             />
 
@@ -309,21 +313,23 @@ export function ContactPage() {
               </label>
               <textarea
                 value={form.message}
-                onChange={(e) => handleChange('message', e.target.value)}
+                onChange={(e) => handleChange("message", e.target.value)}
                 rows={5}
                 placeholder="Tell us about your product and vision..."
                 className={cn(
-                  'w-full rounded-md border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-colors focus:outline-none focus:border-accent',
-                  errors.message ? 'border-destructive' : 'border-border'
+                  "w-full rounded-md border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-colors focus:outline-none focus:border-accent",
+                  errors.message ? "border-destructive" : "border-border",
                 )}
               />
               {errors.message && (
-                <p className="mt-2 text-xs text-destructive">{errors.message}</p>
+                <p className="mt-2 text-xs text-destructive">
+                  {errors.message}
+                </p>
               )}
             </div>
 
             {/* Error */}
-            {status === 'error' && (
+            {status === "error" && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -337,10 +343,10 @@ export function ContactPage() {
             <div className="pt-4">
               <button
                 type="submit"
-                disabled={status === 'loading'}
+                disabled={status === "loading"}
                 className="group flex items-center gap-2 rounded-full bg-foreground px-10 py-4 text-xs font-medium tracking-[0.1em] uppercase text-background transition-all duration-300 hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
               >
-                {status === 'loading' ? (
+                {status === "loading" ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Sending...
@@ -367,7 +373,7 @@ function FormField({
   placeholder,
   required,
   error,
-  type = 'text',
+  type = "text",
 }: {
   label: string;
   value: string;
@@ -388,8 +394,8 @@ function FormField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          'w-full rounded-md border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-colors focus:outline-none focus:border-accent',
-          error ? 'border-destructive' : 'border-border'
+          "w-full rounded-md border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-colors focus:outline-none focus:border-accent",
+          error ? "border-destructive" : "border-border",
         )}
       />
       {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
